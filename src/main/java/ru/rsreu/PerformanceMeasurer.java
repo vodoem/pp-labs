@@ -4,21 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PerformanceMeasurer {
-    private final int warmupRuns;
     private final int measurementRuns;
 
-    public PerformanceMeasurer(int warmupRuns, int measurementRuns) {
-        this.warmupRuns = warmupRuns;
+    public PerformanceMeasurer(int measurementRuns) {
         this.measurementRuns = measurementRuns;
     }
 
     public MeasurementStats measurePerformance(double epsilon) {
-        // Прогрев JVM
-        for (int i = 0; i < warmupRuns; i++) {
-            MonteCarloPiCalculator warmupCalc = new MonteCarloPiCalculator(epsilon);
-            warmupCalc.calculatePi();
-        }
-
         List<Long> executionTimes = new ArrayList<>();
         List<Double> errors = new ArrayList<>();
 
@@ -27,7 +19,7 @@ public class PerformanceMeasurer {
             MonteCarloPiCalculator calc = new MonteCarloPiCalculator(epsilon);
 
             long startTime = System.nanoTime();
-            double piValue = calc.calculatePi();
+            double piValue = calc.calculatePiWithProgress(i);
             long endTime = System.nanoTime();
 
             long executionTime = endTime - startTime;
