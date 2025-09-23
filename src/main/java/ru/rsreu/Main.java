@@ -6,7 +6,7 @@ public class Main {
 
         Thread calculationThread = new Thread(() -> {
             try {
-                // Подбираем epsilon для времени 1-10 секунд (1000-10000 ms)
+                // Подбираем epsilon для времени 1-10 секунд (1000-10000 ms).
                 double optimalEpsilon = measurer.findEpsilonForTargetTime(0.000001, 1000, 10000);
 
                 System.out.printf("\nНайденный оптимальный epsilon: %.10f%n", optimalEpsilon);
