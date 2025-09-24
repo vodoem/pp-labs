@@ -1,33 +1,67 @@
 package ru.rsreu;
 
+import java.util.Scanner;
+
 public class Main {
     public static void main(String[] args) {
-        PerformanceMeasurer measurer = new PerformanceMeasurer(5);
+        TaskManager manager = new TaskManager();
+        Scanner scanner = new Scanner(System.in);
 
-        Thread calculationThread = new Thread(() -> {
+        System.out.println("Добро пожаловать в CLI систему управления задачами!");
+        System.out.println("Доступные команды: start <epsilon>, stop <id>, await <id>, exit");
+
+        while (true) {
+            System.out.print("> ");
+            String input = scanner.nextLine().trim();
+            String[] parts = input.split("\\s+");
+
+            if (parts.length == 0) continue;
+
+            String command = parts[0].toLowerCase();
+
             try {
-                // Подбираем epsilon для времени 1-10 секунд (1000-10000 ms).
-                double optimalEpsilon = measurer.findEpsilonForTargetTime(0.000001, 1000, 10000);
+                switch (command) {
+                    case "start":
+                        if (parts.length != 2) {
+                            System.out.println("Использование: start <epsilon>");
+                            break;
+                        }
+                        double epsilon = Double.parseDouble(parts[1]);
+                        int taskId = manager.startNewTask(epsilon);
+                        System.out.println("Идентификатор задачи: " + taskId);
+                        break;
 
-                System.out.printf("\nНайденный оптимальный epsilon: %.10f%n", optimalEpsilon);
+                    case "stop":
+                        if (parts.length != 2) {
+                            System.out.println("Использование: stop <id>");
+                            break;
+                        }
+                        int stopId = Integer.parseInt(parts[1]);
+                        manager.stopTask(stopId);
+                        break;
 
-                // Финальные измерения с полной статистикой (с прогрессом)
-                MeasurementStats finalStats = measurer.measurePerformance(optimalEpsilon);
-                finalStats.printStats();
+                    case "await":
+                        if (parts.length != 2) {
+                            System.out.println("Использование: await <id>");
+                            break;
+                        }
+                        int awaitId = Integer.parseInt(parts[1]);
+                        manager.awaitTask(awaitId);
+                        break;
 
+                    case "exit":
+                        manager.shutdownAll();
+                        System.out.println("Выход из программы.");
+                        return;
+
+                    default:
+                        System.out.println("Неизвестная команда. Попробуйте снова.");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Ошибка: Неверный числовой формат.");
             } catch (Exception e) {
-                System.err.println("Ошибка: " + e.getMessage());
-                e.printStackTrace();
+                System.out.println("Ошибка: " + e.getMessage());
             }
-        });
-
-        System.out.println("Запуск вычислений в отдельном потоке...");
-        calculationThread.start();
-
-        try {
-            calculationThread.join(); // ждём завершения потока
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         }
     }
 }
