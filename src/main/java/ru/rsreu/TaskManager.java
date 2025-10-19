@@ -25,8 +25,10 @@ public class TaskManager {
 
     public void stopTask(int taskId) {
         MonteCarloTask task = taskRunnables.get(taskId);
+        Thread thread = tasks.get(taskId);
         if (task != null) {
             task.requestStop();
+            thread.interrupt();
             System.out.println("Запрошено завершение задачи #" + taskId);
         } else {
             System.out.println("Задача с номером " + taskId + " не найдена.");
