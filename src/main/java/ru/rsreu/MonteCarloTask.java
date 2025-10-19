@@ -16,8 +16,6 @@ public class MonteCarloTask implements Runnable {
 
     @Override
     public void run() {
-        MonteCarloPiCalculator calculator = new MonteCarloPiCalculator(epsilon);
-
         long insideCircle = 0;
         long totalPoints = 0;
         double piEstimate = 0.0;
