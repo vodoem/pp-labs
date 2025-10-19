@@ -7,58 +7,34 @@ public class Main {
         TaskManager manager = new TaskManager();
         Scanner scanner = new Scanner(System.in);
 
-        System.out.println("Добро пожаловать в CLI систему управления задачами!");
-        System.out.println("Доступные команды: start <epsilon>, stop <id>, await <id>, exit");
+        System.out.println("Добро пожаловать в CLI систему управления параллельными задачами!");
+        System.out.println("Доступные команды: start <points>, exit");
 
         while (true) {
             System.out.print("> ");
             String input = scanner.nextLine().trim();
+            if (input.isEmpty()) continue;
+
             String[] parts = input.split("\\s+");
-
-            if (parts.length == 0) continue;
-
             String command = parts[0].toLowerCase();
 
             try {
                 switch (command) {
                     case "start":
                         if (parts.length != 2) {
-                            System.out.println("Использование: start <epsilon>");
+                            System.out.println("Использование: start <points>");
                             break;
                         }
-                        double epsilon = Double.parseDouble(parts[1]);
-                        int taskId = manager.startNewTask(epsilon);
+                        int points = Integer.parseInt(parts[1]);
+                        int taskId = manager.startParallelTask(points);
                         System.out.println("Идентификатор задачи: " + taskId);
                         break;
-
-                    case "stop":
-                        if (parts.length != 2) {
-                            System.out.println("Использование: stop <id>");
-                            break;
-                        }
-                        int stopId = Integer.parseInt(parts[1]);
-                        manager.stopTask(stopId);
-                        break;
-
-                    case "await":
-                        if (parts.length != 2) {
-                            System.out.println("Использование: await <id>");
-                            break;
-                        }
-                        int awaitId = Integer.parseInt(parts[1]);
-                        manager.awaitTask(awaitId);
-                        break;
-
-                    case "exit":
-                        manager.shutdownAll();
-                        System.out.println("Выход из программы.");
-                        return;
 
                     default:
                         System.out.println("Неизвестная команда. Попробуйте снова.");
                 }
             } catch (NumberFormatException e) {
-                System.out.println("Ошибка: Неверный числовой формат.");
+                System.out.println("Ошибка: неверный числовой формат.");
             } catch (Exception e) {
                 System.out.println("Ошибка: " + e.getMessage());
             }
