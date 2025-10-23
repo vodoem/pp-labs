@@ -1,40 +1,35 @@
 package ru.rsreu;
 
-public class PartialMonteCarloWorker implements Runnable {
+import java.util.concurrent.Callable;
+
+public class PartialMonteCarloWorker implements Callable<Long> {
     private final int points;
-    private final LazyResultStorage storage;
     private final int workerId;
-    private volatile boolean running = true;
-    private long insideCircle = 0;
     private final ProgressTracker progressTracker;
 
-    public PartialMonteCarloWorker(int points, LazyResultStorage storage, int workerId, ProgressTracker tracker) {
+    public PartialMonteCarloWorker(int points, int workerId, ProgressTracker tracker) {
         this.points = points;
-        this.storage = storage;
         this.workerId = workerId;
         this.progressTracker = tracker;
     }
 
-    public void requestStop() {
-        running = false;
-    }
-
     @Override
-    public void run() {
+    public Long call() {
         long localInside = 0;
-        int progressStep = points / 100;
+        int progressStep = Math.max(1, points / 100);
 
-        for (int i = 0; i < points && running; i++) {
+        for (int i = 0; i < points; i++) {
             double x = Math.random();
             double y = Math.random();
-            if (x * x + y * y <= 1.0) localInside++;
+            if (x * x + y * y <= 1.0) {
+                localInside++;
+            }
 
-            if (i % progressStep == 0) {
-                progressTracker.update(workerId, (double) i / points);
+            if ((i + 1) % progressStep == 0 || i == points - 1) {
+                progressTracker.update(workerId, (double) (i + 1) / points);
             }
         }
 
-        storage.addResult(localInside);
-        progressTracker.update(workerId, 1.0);
+        return localInside;
     }
 }
