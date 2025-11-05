@@ -6,19 +6,20 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.locks.ReentrantLock;
+
+import ru.rsreu.sync.MonitorCountDownLatch;
+import ru.rsreu.sync.MonitorReentrantLock;
+import ru.rsreu.sync.MonitorSemaphore;
 
 public class ParallelMonteCarloTask implements Runnable {
     private final int totalPoints;
     private final int numThreads;
     private final int taskId;
-    private final Semaphore semaphore;
+    private final MonitorSemaphore semaphore;
 
-    public ParallelMonteCarloTask(int totalPoints, int numThreads, int taskId, Semaphore semaphore) {
+    public ParallelMonteCarloTask(int totalPoints, int numThreads, int taskId, MonitorSemaphore semaphore) {
         this.totalPoints = totalPoints;
         this.numThreads = numThreads;
         this.taskId = taskId;
@@ -37,11 +38,11 @@ public class ParallelMonteCarloTask implements Runnable {
 
             int actualWorkers = Math.min(numThreads, totalPoints);
             ExecutorService executor = Executors.newFixedThreadPool(actualWorkers);
-            ReentrantLock progressLock = new ReentrantLock();
+            MonitorReentrantLock progressLock = new MonitorReentrantLock();
             ProgressTracker tracker = new ProgressTracker(actualWorkers, progressLock);
             AtomicInteger remainingWorkers = new AtomicInteger(actualWorkers);
             AtomicLong finalCompletionTime = new AtomicLong();
-            CountDownLatch completionLatch = new CountDownLatch(1);
+            MonitorCountDownLatch completionLatch = new MonitorCountDownLatch(1);
 
             int basePointsPerWorker = totalPoints / actualWorkers;
             int remainder = totalPoints % actualWorkers;

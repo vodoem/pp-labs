@@ -1,9 +1,10 @@
 package ru.rsreu;
 
 import java.util.concurrent.Callable;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+
+import ru.rsreu.sync.MonitorCountDownLatch;
 
 public class PartialMonteCarloWorker implements Callable<Long> {
     private final int points;
@@ -12,7 +13,7 @@ public class PartialMonteCarloWorker implements Callable<Long> {
     private final ProgressTracker progressTracker;
     private final AtomicInteger remainingWorkers;
     private final AtomicLong finalCompletionTime;
-    private final CountDownLatch completionLatch;
+    private final MonitorCountDownLatch completionLatch;
 
     public PartialMonteCarloWorker(int points,
                                   int workerId,
@@ -20,7 +21,7 @@ public class PartialMonteCarloWorker implements Callable<Long> {
                                   ProgressTracker tracker,
                                   AtomicInteger remainingWorkers,
                                   AtomicLong finalCompletionTime,
-                                  CountDownLatch completionLatch) {
+                                  MonitorCountDownLatch completionLatch) {
         this.points = points;
         this.workerId = workerId;
         this.taskId = taskId;
