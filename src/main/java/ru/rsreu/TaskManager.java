@@ -2,20 +2,20 @@ package ru.rsreu;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Semaphore;
+import ru.rsreu.sync.MonitorSemaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class TaskManager {
     private final Map<Integer, Thread> tasks = new ConcurrentHashMap<>();
     private final AtomicInteger idGenerator = new AtomicInteger(1);
-    private final Semaphore taskSemaphore;
+    private final MonitorSemaphore taskSemaphore;
 
     public TaskManager() {
         this(Math.max(1, Runtime.getRuntime().availableProcessors() / 2));
     }
 
     public TaskManager(int maxConcurrentTasks) {
-        this.taskSemaphore = new Semaphore(Math.max(1, maxConcurrentTasks));
+        this.taskSemaphore = new MonitorSemaphore(Math.max(1, maxConcurrentTasks));
     }
 
     public int startParallelTask(int totalPoints) {
